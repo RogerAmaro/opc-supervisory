@@ -4,7 +4,41 @@ from Tkinter import *
 from random import randint
 janela = Tk()
 import OpenOPC
-from time import sleep
+from time import sleep,time
+
+sensor = []
+contP = 0
+start = time()
+
+def timer():
+    newtime = time()
+    tempo =  newtime - start
+    
+    
+
+def contagem():
+    global contP
+    global sensor
+    if read("Operando")=="True":
+        if read("Sensor_opticoD")=="True":
+            if sensor[-1]!="True":
+                sensor.append(1)
+        else:
+            if sensor[-1]!="False":
+                sensor.append(0)
+    return sensor
+
+
+
+
+def estado():
+    tags = [["Parado",read("Parado")],["Parando",read("Parando")],["Manoal",read("Manoal")],["Reiniciando",read("Reiniciando")],["Pronto",read("Pronto")],["Operando",read("Operando")]]
+
+    for i in tags:
+       if i[1]=="True":
+          return i[0]
+
+ 
 
 def connect(name = "OPC.SimaticHMI.CoRtHmiRTm"):
     objOpc = OpenOPC.client()
@@ -26,14 +60,14 @@ def bt_start():
     def reset_color():
         bt_start.configure(bg="gainsboro")
     bt_start.configure(bg = "green")
-    janela.after(2000,reset_color)
+    janela.after(100,reset_color)
 
 def bt_stop():
     set_var("Botao_Stop_Remoto")
     def reset_color():
         bt_stop.configure(bg="gainsboro")
     bt_stop.configure(bg = "red")
-    janela.after(2000,reset_color)
+    janela.after(100,reset_color)
 def bt_reset():
     set_var("Botao_Reset_Remoto")
 
@@ -72,17 +106,17 @@ state_system = "OPERANDO"
 text_operando =  Label(janela, text="", background="gray")
 text_operando.place(x=760,y=20)
 #------------------------------------------------------------#
-V = StringVar()
 def setV():
-    text_producao["text"]= read("Sensor_opticoD")
-    #text_procucao.configute(text=read("Sensor_opticoD"))
-    #V.set(read("Sensor_opticoD"))
+    text_producao.configure(text= contagem())
+    text_timeProd.configure(text=timer())
+    text_operando.configure(text = estado())
+    return janela.after(100,setV)
+    
 
-#newV = V
 
 text_producao = Label(janela,text="----", background="gray")
 text_producao.place(x=100,y=90)
-janela.after(1,setV)
+
 
 text_timeProd = Label(janela,text="------", background="gray")
 text_timeProd.place(x=100,y=130)
@@ -93,12 +127,11 @@ text_timeProd.place(x=100,y=170)
 text_press =  Label(janela,text="------", background="gray")
 text_press.place(x=100,y=210)
 
-
+text_operando = Label(janela, text="--", background="gray")
+text_operando.place(x=750,y=20)
 
 #buttons(janela)
 #textsLabels(janela)
-
-
 
 
 
@@ -113,12 +146,12 @@ janela['bg']="gray"
 janela.title("SISTEMA SUPERVISORIO MUSCLE FLUID PRESS")
 
 
+print(contagem())
 
 
 
-
-
-janela.mainloop()
+setV()
+#janela.mainloop()
 
 
 
